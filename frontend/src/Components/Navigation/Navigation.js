@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import avatar from "../../img/avatar.png";
 import { signout } from "../../utils/Icons";
@@ -6,44 +6,42 @@ import { useAuth } from "../../context/authContext";
 
 function Navigation({ active, setActive }) {
   const { logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleNav = (num) => {
+    setActive(num);
+    setMenuOpen(false);
+  };
 
   return (
-    <NavigationStyled>
-      {/* ⭐ Profile Section */}
-      <div className="user-con">
-        <img src={avatar} alt="user" />
-        <div className="text">
-          <h2>Budget Wise</h2>
+    <NavigationStyled menuOpen={menuOpen}>
+      <div className="nav-header">
+        {/* ⭐ Profile Section */}
+        <div className="user-con">
+          <img src={avatar} alt="user" />
+          <div className="text">
+            <h2>Budget Wise</h2>
+          </div>
         </div>
+
+        {/* ⭐ Hamburger for mobile */}
+        <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? '✕' : '☰'}
+        </button>
       </div>
 
       {/* ⭐ Menu */}
       <ul className="menu-items">
-        <li
-          onClick={() => setActive(1)}
-          className={active === 1 ? "menu-item active" : "menu-item"}
-        >
+        <li onClick={() => handleNav(1)} className={active === 1 ? "menu-item active" : "menu-item"}>
           Dashboard
         </li>
-
-        <li
-          onClick={() => setActive(2)}
-          className={active === 2 ? "menu-item active" : "menu-item"}
-        >
+        <li onClick={() => handleNav(2)} className={active === 2 ? "menu-item active" : "menu-item"}>
           View Transactions
         </li>
-
-        <li
-          onClick={() => setActive(3)}
-          className={active === 3 ? "menu-item active" : "menu-item"}
-        >
+        <li onClick={() => handleNav(3)} className={active === 3 ? "menu-item active" : "menu-item"}>
           Incomes
         </li>
-
-        <li
-          onClick={() => setActive(4)}
-          className={active === 4 ? "menu-item active" : "menu-item"}
-        >
+        <li onClick={() => handleNav(4)} className={active === 4 ? "menu-item active" : "menu-item"}>
           Expenses
         </li>
       </ul>
@@ -70,6 +68,21 @@ const NavigationStyled = styled.div`
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+
+  .nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
 
   .user-con {
     display: flex;
@@ -148,6 +161,37 @@ const NavigationStyled = styled.div`
       &:hover {
         background: #ff1744;
       }
+    }
+  }
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    padding: 1rem 1.5rem;
+
+    .hamburger {
+      display: block;
+      margin-bottom: 1.5rem;
+    }
+
+    .user-con {
+      margin-bottom: 0;
+
+      img { width: 45px; height: 45px; }
+      .text h2 { font-size: 1.1rem; }
+    }
+
+    .menu-items {
+      display: ${({ menuOpen }) => menuOpen ? 'flex' : 'none'};
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .bottom-nav {
+      display: ${({ menuOpen }) => menuOpen ? 'block' : 'none'};
+      margin-top: 1rem;
     }
   }
 `;

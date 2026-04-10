@@ -525,6 +525,33 @@ const DashboardStyled = styled.div`
             font-size: 0.8rem;
         }
     }
+        @media (max-width: 768px) {
+    .stat-cards {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+    }
+
+    .card p { font-size: 1.3rem; }
+    .card.balance p { font-size: 1.5rem; }
+
+    .summary-section {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+    }
+
+    .budget-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+    }
+
+    .bottom-con {
+      grid-template-columns: 1fr;
+    }
+
+    .chart-con {
+      height: 250px;
+    }
+  }
 `;
 
 export default Dashboard;
