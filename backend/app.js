@@ -1,25 +1,50 @@
-const express = require('express')
+require('dotenv').config();   // ✅ MUST be first
+
+const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const { db } = require('./db/db');
-const {readdirSync} = require('fs')
-const app = express()
+const { readdirSync } = require('fs');
 
-require('dotenv').config()
+const app = express();
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 
 //middlewares
-app.use(express.json())
-app.use(cors())
+app.use(express.json());
+app.use(helmet());
 
-//routes
-readdirSync('./routes').map((route) => app.use('/api/v1', require('./routes/' + route)))
+app.use(cors({
+    origin: process.env.CLIENT_URL,  // better practice
+    credentials: true,
+}));
+
+// ⭐ Health check
+app.get('/', (req, res) => {
+    res.send('Budget Wise API is running 🚀');
+});
+
+// 🔥 Load all routes automatically
+readdirSync('./routes').map((route) => {
+    app.use('/api/v1', require('./routes/' + route));
+});
+
+// ✅ Auth routes
+app.use('/api/v1/auth', require('./routes/authRoutes'));
+
+// ⭐ Global error handler
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(500).json({
+        message: "Something went wrong",
+    });
+});
 
 const server = () => {
-    db()
+    db();
     app.listen(PORT, () => {
-        console.log('listening to port:', PORT)
-    })
-}
+        console.log('Server running on port:', PORT);
+    });
+};
 
-server()
+server();
