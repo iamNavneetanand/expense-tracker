@@ -3,6 +3,8 @@ import { QRCodeCanvas } from "qrcode.react";
 import styled from "styled-components";
 import axios from "axios";
 
+const BASE_URL = "https://expense-tracker-backend-36o7.onrender.com/api/v1/";
+
 function UPIPayment({ onSuccess }) {
   const [amount, setAmount] = useState("");
   const [upiId, setUpiId] = useState("");
@@ -15,7 +17,6 @@ function UPIPayment({ onSuccess }) {
   const name = "BudgetWise";
   const upiLink = `upi://pay?pa=${upiId}&pn=${name}&am=${amount}&cu=INR`;
 
-  // ✅ Restore pending transaction on page load
   useEffect(() => {
     const savedTxnId = localStorage.getItem("pendingUpiTxnId");
     if (savedTxnId) {
@@ -32,20 +33,19 @@ function UPIPayment({ onSuccess }) {
     return "other";
   };
 
-  /* Log transaction to backend */
   const logTransaction = async () => {
     if (!amount || !upiId) return alert("Enter amount and UPI ID first!");
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/upi-log", {
+      const res = await axios.post(`${BASE_URL}upi-log`, {
         amount,
         upiId,
         description,
       });
       const txnId = res.data.txn._id;
       setPendingTxnId(txnId);
-      localStorage.setItem("pendingUpiTxnId", txnId); // ✅ save to localStorage
+      localStorage.setItem("pendingUpiTxnId", txnId);
       return txnId;
     } catch (err) {
       console.log(err);
@@ -56,7 +56,6 @@ function UPIPayment({ onSuccess }) {
     }
   };
 
-  /* Pay with UPI app */
   const handlePayment = async () => {
     const txnId = await logTransaction();
     if (!txnId) return;
@@ -64,27 +63,23 @@ function UPIPayment({ onSuccess }) {
     setTimeout(() => setShowConfirm(true), 4000);
   };
 
-  /* QR flow */
   const handleQRConfirm = async () => {
     const txnId = await logTransaction();
     if (!txnId) return;
     setShowConfirm(true);
   };
 
-  /* Confirm payment success */
   const confirmSuccess = async () => {
-    const txnId = pendingTxnId || localStorage.getItem("pendingUpiTxnId"); // ✅ fallback
-    console.log("pendingTxnId:", txnId);
+    const txnId = pendingTxnId || localStorage.getItem("pendingUpiTxnId");
     if (!txnId) return alert("No pending transaction found!");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/upi-success", {
+      await axios.post(`${BASE_URL}upi-success`, {
         id: txnId,
         category: detectCategory(description),
       });
-      console.log("Response:", res.data);
 
-      localStorage.removeItem("pendingUpiTxnId"); // ✅ clean up
+      localStorage.removeItem("pendingUpiTxnId");
       onSuccess && onSuccess();
       setShowConfirm(false);
       setShowQR(false);
