@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/v1/auth/";
+const BASE_URL = "https://expense-tracker-backend-36o7.onrender.com/api/v1/auth/";
 
 const AuthContext = React.createContext();
 
@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // ✅ Auto-login if token exists
     useEffect(() => {
         if (token) {
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
