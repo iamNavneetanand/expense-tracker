@@ -7,7 +7,7 @@ exports.addIncome = async (req, res) => {
     const income = new IncomeSchema({
         userId,
         title,
-        amount,
+        amount: Number(amount), // ✅ convert to number
         category,
         description,
         date
@@ -17,7 +17,7 @@ exports.addIncome = async (req, res) => {
         if (!title || !category || !description || !date) {
             return res.status(400).json({ message: 'All fields are required!' });
         }
-        if (amount <= 0 || typeof amount !== 'number') {
+        if (Number(amount) <= 0) { // ✅ fixed check
             return res.status(400).json({ message: 'Amount must be a positive number!' });
         }
         await income.save();
